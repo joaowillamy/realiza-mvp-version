@@ -1,11 +1,46 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Container,
+  Flex,
+  Heading,
+  HStack,
+  IconButton,
+  useBreakpointValue,
+  Stack, 
+  Text,
+  LinkBox
+} from '@chakra-ui/react';
+import NextLink from 'next/link';
+import { useState } from "react";
+import { FiMenu } from 'react-icons/fi';
 
 import { api } from "@/utils/api";
 
+const buttons = {
+  login: 'login',
+  create: 'create',
+};
+
+type Buttons = keyof typeof buttons;
+
+
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const isDesktop = useBreakpointValue({ base: false, lg: true });
+  const [isLoading, setIsLoading] = useState<Buttons | null>(null);
+
+  const onClick = (button: Buttons) => {
+    setIsLoading(button);
+  };
+
+  const isLoadingButton = (button: Buttons): boolean => {
+    return isLoading === button;
+  };
 
   return (
     <>
@@ -15,6 +50,82 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
+
+
+
+    <Flex backgroundColor={'gray.50'} flexDirection={'column'}>
+      <Box p={5} mb={2} backgroundColor={'white'} borderWidth="1px" borderBottomRadius="2xl" shadow={'md'}>
+        <Container maxW="7xl">
+          <Flex align="center" justifyContent={'space-between'}>
+            <Heading color="twitter.600">Realiza</Heading>
+            {isDesktop ? (
+              <Flex justify="space-between" flex="1">
+                <ButtonGroup ml={10} variant="link" spacing="8">
+                  {['Home', 'Blog'].map((item) => (
+                    <Button key={item}>{item}</Button>
+                  ))}
+                </ButtonGroup>
+
+                <HStack spacing="3">
+                  <LinkBox as={NextLink}  href={'/auth/sign-up'}>
+                    <Button
+                      tabIndex={-1}
+                      mr={4}
+                      color="twitter.400"
+                      isLoading={isLoadingButton('create')}
+                      onClick={() => onClick('create')}
+                      variant="unstyled"
+                    >
+                      Cadastre-se
+                    </Button>
+                  </LinkBox>
+                  <LinkBox as={NextLink} href={'/auth/sign-in'}>
+                    <Button
+                      tabIndex={-1}
+                      colorScheme="twitter"
+                      isLoading={isLoadingButton('login')}
+                      onClick={() => onClick('login')}
+                    >
+                      Entrar
+                    </Button>
+                  </LinkBox>
+                </HStack>
+              </Flex>
+            ) : (
+              <IconButton variant="ghost" icon={<FiMenu fontSize="1.25rem" />} aria-label="Open Menu" />
+            )}
+          </Flex>
+        </Container>
+      </Box>
+    </Flex>
+
+
+
+
+{/* ***************************** */}
+
+<Box as="section" bg="gray.100">
+        <Container py={{ base: '16', md: '24' }}>
+          <Stack spacing={{ base: '8', md: '10' }}>
+            <Stack spacing={{ base: '4', md: '5' }} align="center">
+              <Heading size={{ base: 'sm', md: 'md' }}>Preparado para crescer?</Heading>
+              <Text color="muted" maxW="2xl" textAlign="center" fontSize="xl">
+                Venha conhecer essa nova plataforma incrível, não vai se arrepender dos beneficios.
+              </Text>
+            </Stack>
+            <Stack spacing="3" direction={{ base: 'column', sm: 'row' }} justify="center">
+              <Button variant="outline" size="lg">
+                Saíba mais
+              </Button>
+              <Button variant="solid" colorScheme={'twitter'} size="lg">
+                Cadastre-se, é Grátis!
+              </Button>
+            </Stack>
+          </Stack>
+        </Container>
+      </Box>
+      {/* ***************************** */}
+
         <div>
           <p>
             {hello.data ? hello.data.greeting : "Loading tRPC query..."}
